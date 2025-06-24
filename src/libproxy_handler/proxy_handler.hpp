@@ -1,0 +1,24 @@
+#pragma once
+#include <string>
+#include <filesystem>
+#include <string_view>
+#include <utility>
+#include <expected>
+class ProxyHandler{
+    public:
+    ProxyHandler();
+    auto set(const std::string& ip, const std::string& port) -> std::expected<void, std::string>;
+    auto get() -> std::expected<std::pair<std::string,std::string>,std::string>;
+    [[maybe_unused]] int run (const std::string& ip, const std::string& port,const std::string& cmd);
+    void reset();
+    void set_snap (const bool);
+    bool snap_available() const;
+    bool is_on() const;
+    static bool cmd_exists (const std::string_view executable);
+    private:
+    bool gsettings,snap,kde,git;
+    void proxy_file_set(const std::string_view);
+    auto validate_inputs(const std::string& ip, const std::string& port)->std::expected<void, std::string> const;
+    const std::filesystem::path username;
+    const std::filesystem::path proxyfile_path;
+};

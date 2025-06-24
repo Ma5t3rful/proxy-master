@@ -1,0 +1,7 @@
+.cache/
+build/
+*.o
+.cmake 
+ninja_deps
+*.json 
+*.c
