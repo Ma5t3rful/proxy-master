@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Proxy Master
+Type=Application
+Categories=Utility;
+Terminal=false
+Exec=proxy-master
+Icon=proxy-master

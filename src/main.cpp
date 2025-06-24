@@ -50,7 +50,7 @@ auto main (int argc,char**argv) -> int
         return 0;
     }
     
-    //this software is already windows-only linux-specific way to find current exe
+    //this software is already linux-only. linux-specific way to find current exe
     const auto theme_path = std::filesystem::canonical("/proc/self/exe").remove_filename()/"dark.txt";
     if(std::filesystem::exists(theme_path))
         tgui::Theme::setDefault(theme_path.string());
