@@ -125,6 +125,11 @@ void ProxyHandler::reset()
         std::system("gsettings set org.gnome.system.proxy mode 'none'")!=0)
         throw std::runtime_error("gsettings failed to unset your proxy.");
     }
+    if(git)
+    {
+        std::ignore = std::system("git config --global --unset http.proxy&&"
+                                  "git config --global --unset https.proxy");
+    }
 }
 
 auto ProxyHandler::get() -> std::expected<std::pair<std::string,std::string>, std::string>
