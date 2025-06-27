@@ -1,6 +1,5 @@
 #include "switch_widget.hpp"
 #include "TGUI/Color.hpp"
-#include "TGUI/Loading/Theme.hpp"
 #include "TGUI/Renderers/ButtonRenderer.hpp"
 #include "TGUI/Texture.hpp"
 #include <functional>
@@ -22,14 +21,13 @@ m_state(false)
     m_off_texture.loadFromMemory(power_button_icon_off_png, sizeof(power_button_icon_off_png));
     setImageScaling(1);
     setImage(m_off_texture);
-    tgui::Theme white_theme ("");
-    setRenderer(white_theme.getRenderer("Button"));
     for(const auto renderer = getRenderer();const auto &f: {
         &tgui::ButtonRenderer::setBackgroundColor,
         &tgui::ButtonRenderer::setBackgroundColorDown,
         &tgui::ButtonRenderer::setBackgroundColorHover,
-        &tgui::ButtonRenderer::setBackgroundColorDown,
+        &tgui::ButtonRenderer::setBackgroundColorDownFocused,
         &tgui::ButtonRenderer::setBackgroundColorFocused,
+        &tgui::ButtonRenderer::setBackgroundColorDownHover,
         &tgui::ButtonRenderer::setBorderColorFocused,
         &tgui::ButtonRenderer::setBorderColor,
         &tgui::ButtonRenderer::setBorderColorDown,
