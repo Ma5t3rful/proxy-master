@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+rm -fr AppDir
 pushd build
 cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
