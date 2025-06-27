@@ -6,11 +6,11 @@
 
 // Finally embed. No need to use xxd -i and CMake garbage for this.
 unsigned char power_button_icon_on_png[]={
-    #embed "../ui/switches/power_button_icon_on.png"
+    #embed "power_button_icon_on.png"
 };
 
 unsigned char power_button_icon_off_png[]={
-    #embed "../ui/switches/power_button_icon_off.png"
+    #embed "power_button_icon_off.png"
 };
 
 

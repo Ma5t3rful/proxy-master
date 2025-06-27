@@ -177,7 +177,7 @@ void MasterWindow::on_force_off_cliced()
 
 void MasterWindow::on_actions_cmbobx_changed (const int selected_idx)
 {
-    logger->log(std::format("Item changed to"));
+    logger->log(std::format("Item changed to: {}",selected_idx));
     actions_combobox->deselectItem();
 }
 
