@@ -153,11 +153,13 @@ int ProxyHandler::run(const std::string &ip, const std::string &port, const std:
 
 void ProxyHandler::proxy_file_set(const std::string_view addr)
 {
-    std::filesystem::permissions(proxyfile_path,
+    // File is open but changing its premissions won't make any issues. 
+    // the order is important because for the first time the config file does not exist and changing premission of a non-existant file will throw.
+    std::ofstream proxyfile(proxyfile_path);
+    std::filesystem::permissions(proxyfile_path, 
                 std::filesystem::perms::owner_all | 
                 std::filesystem::perms::group_all,
                 std::filesystem::perm_options::add);
-    std::ofstream proxyfile(proxyfile_path);
     if (addr.empty())std::println(proxyfile);// override to a single endline
     else std::println(proxyfile,
 R"(#!/bin/sh
