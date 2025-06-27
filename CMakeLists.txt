@@ -3,6 +3,7 @@ project(proxy-master VERSION 4.1)
 set(CMAKE_CXX_STANDARD 26)
 set(BUILD_SHARED_LIBS OFF)      # Determines whether TGUI build a static or dynamic/shared library
 set(TGUI_BACKEND GLFW_OPENGL3)  # Sets which backend TGUI will use
+set(TGUI_BUILD_GUI_BUILER OFF)
 include(FetchContent)
 FetchContent_Declare(
     TGUI
