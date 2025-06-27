@@ -5,3 +5,7 @@ build/
 ninja_deps
 *.json 
 *.c
+AppDir
+appdir
+Appdir
+*.AppImage
