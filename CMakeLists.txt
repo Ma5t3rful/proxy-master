@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.25) # Mandatory for C++26
 project(proxy-master VERSION 4.2)
 set(CMAKE_CXX_STANDARD 26)
 set(BUILD_SHARED_LIBS OFF)      # Determines whether TGUI build a static or dynamic/shared library
