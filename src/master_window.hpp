@@ -21,13 +21,14 @@ public tgui::Gui
     private:
     void on_mainswitch_clicked();
     void on_manage_clicked();
-    void on_go_command_clicked ();
+    void on_go_command_clicked();
     void on_force_off_cliced();
-    void on_actions_cmbobx_changed(const int);
-    void on_bookmark_cmbobx_changed (const int);
+    void on_actions_cmbobx_changed (const int);
+    void on_bookmark_cmbobx_changed(const int);
     void on_about_btn_clicked();
+    void on_any_input_changed();
     void bookmarks_changed(const std::vector<ip_entry>*const bookmarks);
-    void show_messagebox(const std::string_view title,const std::string_view message);
+    void show_messagebox  (const std::string_view title,const std::string_view message);
 
     private:
     std::mutex messagebox_mutex; // for show_messagebox();

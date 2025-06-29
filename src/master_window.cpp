@@ -95,7 +95,7 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
     
     //workaround for streched checkbox
     const auto checkbox_orig_size = snap->getSize().y;
-    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::Widget::setWidth),snap.get(),checkbox_orig_size);
+    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap.get(),checkbox_orig_size);
     
     bookmark_cmbobx->onItemSelect(&MasterWindow::on_bookmark_cmbobx_changed,this);
     bookmark_cmbobx->setDefaultText("Bookmarks");
@@ -134,6 +134,8 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
         main_switch->set_state(SwitchWidget::STATE::OFF);
         logger->log(prev_ip_port.error(),LoggerWidget::ERROR);
     }
+    ip_input->onTextChange(&MasterWindow::on_any_input_changed,this);
+    port_input->onTextChange(&MasterWindow::on_any_input_changed,this);
     add(title_label);
     add(main_switch);
     add(force_off_button);
@@ -154,7 +156,9 @@ void MasterWindow::on_mainswitch_clicked()
         proxy_handler->reset();
         main_switch->set_state(SwitchWidget::STATE::OFF);
         logger->log("Current State: <b>OFF</b>",LoggerWidget::WARNING);
-        }catch(const std::exception& e){logger->log(e.what(),LoggerWidget::ERROR);}
+        }catch(const std::exception& e){
+            logger->log(e.what(),LoggerWidget::ERROR);
+        }
         return;
     }
     const auto ip = ip_input->getText().toStdString();
@@ -180,6 +184,16 @@ void MasterWindow::on_actions_cmbobx_changed (const int selected_idx)
 {
     logger->log(std::format("Item changed to: {}",selected_idx));
     actions_combobox->deselectItem();
+}
+
+
+void MasterWindow::on_any_input_changed()
+{
+    const auto state = main_switch->state(); 
+    if(state == SwitchWidget::STATE::ON)
+    {
+        main_switch->set_state(SwitchWidget::STATE::LIMBO);
+    }
 }
 
 
