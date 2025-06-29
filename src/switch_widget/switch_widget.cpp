@@ -2,7 +2,10 @@
 #include "TGUI/Color.hpp"
 #include "TGUI/Renderers/ButtonRenderer.hpp"
 #include "TGUI/Texture.hpp"
+#include <array>
 #include <functional>
+#include <iterator>
+#include <utility>
 
 // Finally embed. No need to use xxd -i and CMake garbage for this.
 unsigned char power_button_icon_on_png[]={
@@ -13,12 +16,17 @@ unsigned char power_button_icon_off_png[]={
     #embed "power_button_icon_off.png"
 };
 
+unsigned char power_button_icon_limbo_png[]={
+    #embed "power_button_icon_limbo.png"
+};
 
 SwitchWidget::SwitchWidget():
-m_state(false)
+m_state(SwitchWidget::STATE::OFF)
 {
-    m_on_texture.loadFromMemory(power_button_icon_on_png, sizeof(power_button_icon_on_png));
-    m_off_texture.loadFromMemory(power_button_icon_off_png, sizeof(power_button_icon_off_png));
+    m_on_texture.loadFromMemory(power_button_icon_on_png, std::size(power_button_icon_on_png));
+    m_off_texture.loadFromMemory(power_button_icon_off_png, std::size(power_button_icon_off_png));
+    m_limbo_texture.loadFromMemory(power_button_icon_limbo_png, std::size(power_button_icon_limbo_png));
+    
     setImageScaling(1);
     setImage(m_off_texture);
     for(const auto renderer = getRenderer();const auto &f: {
@@ -35,13 +43,15 @@ m_state(false)
     }) std::invoke(f,renderer,tgui::Color("transparent")); //makes everything transparent so the button will be hidden and only the switch is shown.
 }
 
-void SwitchWidget::set_state (const bool state)
+void SwitchWidget::set_state (const SwitchWidget::STATE state)
 {
-    setImage(state?m_on_texture:m_off_texture);
+    //todo add limbo textures
+    const auto textures = std::array<std::reference_wrapper<tgui::Texture>, 3> {m_limbo_texture,m_off_texture,m_on_texture};
+    setImage(textures.at(std::to_underlying(state)+1));
     m_state = state;
 }
 
-bool SwitchWidget::state() const 
+auto SwitchWidget::state() const -> SwitchWidget::STATE
 {
     return m_state;
 }

@@ -9,3 +9,5 @@ AppDir
 appdir
 Appdir
 *.AppImage
+clangd
+.idx

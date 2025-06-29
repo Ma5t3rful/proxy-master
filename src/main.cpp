@@ -9,7 +9,7 @@
 #include "master_window.hpp"
 #include "sdl_backend_helper.hpp"
 
-std::string parse_arg (const std::string_view arg)
+auto parse_arg (const std::string_view arg) -> std::string
 {
     if (arg.starts_with("--")) {
         return std::string(arg.substr(2));

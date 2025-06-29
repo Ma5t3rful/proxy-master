@@ -105,8 +105,6 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
     force_off_button->setHeight(default_height);
     const auto ip_entries = manage_window->get_entries();
     bookmarks_changed(ip_entries);
-    const auto prev_ip_port = proxy_handler->get();
-    logger->log(std::format("Current State: {}",prev_ip_port.has_value()?"<b>ON</b>":"<b>OFF</b>"), prev_ip_port.has_value()?LoggerWidget::SUCCESS: LoggerWidget::WARNING);
     const auto snap_available = proxy_handler->snap_available();
     if(snap_available)
     {
@@ -115,12 +113,15 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
         actions_combobox->addItem("Re-disable with snap");
     }
     snap->setEnabled(snap_available);
-    if(prev_ip_port)
+    const auto prev_ip_port = proxy_handler->get();
+    logger->log(std::format("Current State: {}",prev_ip_port.has_value()?"<b>ON</b>":"<b>OFF</b>"),
+                            prev_ip_port.has_value()?LoggerWidget::SUCCESS: LoggerWidget::WARNING);
+    if(prev_ip_port.has_value())
     {
-        const auto& [prev_ip,prev_port] = *prev_ip_port;//already checked so It's safe
+        const auto& [prev_ip,prev_port] = *prev_ip_port;//already checked so it's safe plus we have fhardened now.
         ip_input->setText(prev_ip);
         port_input->setText(prev_port);
-        main_switch->set_state(true);
+        main_switch->set_state(SwitchWidget::STATE::ON);
         if(const auto find = std::ranges::find_if(*ip_entries,[&prev_ip,&prev_port](const auto &e){const auto& [_,ip,port] = e;return ip == prev_ip&&port == prev_port;});
         find != ip_entries->end())
         {
@@ -130,7 +131,7 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
     }
     else
     {
-        main_switch->set_state(false);
+        main_switch->set_state(SwitchWidget::STATE::OFF);
         logger->log(prev_ip_port.error(),LoggerWidget::ERROR);
     }
     add(title_label);
@@ -147,11 +148,11 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
 void MasterWindow::on_mainswitch_clicked()
 {
     proxy_handler->set_snap(snap->isChecked());
-    if(main_switch->state() == true)// then turn it off
+    if(main_switch->state()==SwitchWidget::STATE::ON)// if on then turn it off
     {
         try{
         proxy_handler->reset();
-        main_switch->set_state(false);
+        main_switch->set_state(SwitchWidget::STATE::OFF);
         logger->log("Current State: <b>OFF</b>",LoggerWidget::WARNING);
         }catch(const std::exception& e){logger->log(e.what(),LoggerWidget::ERROR);}
         return;
@@ -159,9 +160,9 @@ void MasterWindow::on_mainswitch_clicked()
     const auto ip = ip_input->getText().toStdString();
     const auto port = port_input->getText().toStdString();
     if(const auto res = proxy_handler->set(ip, port);
-    res.has_value())
+    res)
     {
-        main_switch->set_state(true);
+        main_switch->set_state(SwitchWidget::STATE::ON);
         logger->log(std::format("addr: http://{}:{}",ip,port),LoggerWidget::SUCCESS);
         logger->log("Current State: <b>ON</b>", LoggerWidget::SUCCESS);
     }
@@ -171,7 +172,7 @@ void MasterWindow::on_mainswitch_clicked()
 void MasterWindow::on_force_off_cliced()
 {
     proxy_handler->reset();
-    main_switch->set_state(false);
+    main_switch->set_state(SwitchWidget::STATE::OFF);
     logger->log("All proxy settings has been resetted", LoggerWidget::SUCCESS);
 }
 
