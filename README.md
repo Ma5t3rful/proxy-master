@@ -21,6 +21,10 @@ It's a simple app to change your proxy settings everywhere. It automatically cha
 - yt-dlp: adds appropriate flags to guide yt-dlp to use the system's proxy
 - snap: has its own settings (but sometimes changing it can be really slow for some reason)
 
+## Screenshot
+
+<p align="center"><img src=misc/screenshot.png></img></p>
+
 ## How to build 
 
 This app uses TGUI and C++26 (with hardend `std` and other safety features)
