@@ -8,7 +8,7 @@ include(FetchContent)
 FetchContent_Declare(
     TGUI
     GIT_REPOSITORY https://github.com/texus/TGUI
-    GIT_TAG v1.4.0  
+    GIT_TAG 403a0ce3a9234ab4f10528b7db6162becf6082ad 
 )
 FetchContent_MakeAvailable(TGUI)
 file(GLOB_RECURSE PROXY_MASTER_SRC src/*.cpp)
