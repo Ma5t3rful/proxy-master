@@ -49,7 +49,7 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
     title_label->setPosition(0,10);
     title_label->setTextSize(32);
     title_label->setHeight(48);
-    title_label->setScrollbarPolicy(tgui::Scrollbar::Policy::Never);
+    title_label->getScrollbar()->setPolicy(tgui::Scrollbar::Policy::Never);
     title_label->setHorizontalAlignment(tgui::HorizontalAlignment::Center);
     actions_combobox->setOrigin(0.5f,0);
     actions_combobox->setPosition("50%",190);
@@ -118,7 +118,7 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
                             prev_ip_port.has_value()?LoggerWidget::SUCCESS: LoggerWidget::WARNING);
     if(prev_ip_port.has_value())
     {
-        const auto& [prev_ip,prev_port] = *prev_ip_port;//already checked so it's safe plus we have fhardened now.
+        const auto& [prev_ip,prev_port] = *prev_ip_port; //already checked so it's safe plus we have fhardened now.
         ip_input->setText(prev_ip);
         port_input->setText(prev_port);
         main_switch->set_state(SwitchWidget::STATE::ON);

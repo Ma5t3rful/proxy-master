@@ -79,6 +79,7 @@ m_config_file_address("/home"/std::filesystem::path(std::getenv("USER"))/".confi
     ip_listview->setColumnAutoResize(1, true);
     ip_listview->setColumnAutoResize(2, true);
     ip_listview->setResizableColumns(true);
+    ip_listview->getRenderer()->setScrollbarWidth(8);
     for(const auto& [name,ip,port]:m_ip_list)ip_listview->addItem({name,ip,port});
 }  
 

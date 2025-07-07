@@ -13,6 +13,7 @@ m_buffer ("<color=#ffffff>- **LOGS**\n</color>")
     onClick(&LoggerWidget::on_click,this);
     setText(m_buffer);
     setSize(250,170);
+    getRenderer()->setScrollbarWidth(8);
 }
 
 void LoggerWidget::log(const std::string_view text,const MSG_TYPE type)
@@ -21,7 +22,7 @@ void LoggerWidget::log(const std::string_view text,const MSG_TYPE type)
     m_buffer += std::format("<color={}>- {}</color>\n",color[static_cast<std::size_t>(type)],text);
     std::lock_guard _(m_log_mutex);
     setText(m_buffer);
-    setScrollbarValue(std::numeric_limits<unsigned int>::max());
+    getScrollbar()->setValue(std::numeric_limits<unsigned int>::max());
     if(m_buffer.size()>100000)m_buffer.assign("** Buffer Cleaned **\n");
 }
 
@@ -29,5 +30,11 @@ void LoggerWidget::on_click()
 {
     static auto t = 0;
     t++;
-    if(t==6)log("<color=#ff8800>Congrats: You found a Pizza!</color>");
+    if(t==6)log(
+R"(<color=#ff8800>Congrats: You found a Pizza!
+// ""--.._
+||  (_)  _ "-._
+||    _ (_) °  '-.
+||   (_) O __..-'
+ \\__..--""</color>)");
 }
