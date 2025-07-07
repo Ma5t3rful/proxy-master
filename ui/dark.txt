@@ -25,7 +25,7 @@ BackgroundColorDownHover = rgb(125,125,125); // *
 // Boarders
 Borders = (1);
 BorderColorDisabled = rgb(55,55,55); // *
-BorderColor = rgb(75,75,75);
+BorderColor = rgb(72, 72, 72);
 BorderColorHover = rgb(100,100,100); // *
 BorderColorFocused = rgb(120,120,120); // *
 BorderColorDown = rgb(135,135,135); // *
@@ -62,7 +62,7 @@ HeaderBackgroundColor = rgb(25,25,25); // *
 Padding = 3; // *
 PaddingBetweenButtons = 1; // *
 ButtonDistanceFromSide = 3; // *
-RoundedBorderRadius = 6; // *
+RoundedBorderRadius = 5; // *
 
 Button {
     BackgroundColor = &BackgroundColor;
@@ -95,6 +95,7 @@ ChatBox
 ComboBox
 {
     Padding = &Padding;
+    RoundedBorderRadius = &RoundedBorderRadius;
 }
 
 CheckBox
@@ -116,6 +117,7 @@ EditBox
     CaretWidth = &CaretWidth;
     CaretColor = &CaretColor;
     DefaultTextColor = &TextColorDisabled;
+    RoundedBorderRadius = &RoundedBorderRadius;
 }
 
 ListBox
