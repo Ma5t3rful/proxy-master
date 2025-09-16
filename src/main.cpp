@@ -31,7 +31,10 @@ auto main (int argc,char**argv) -> int
     {
         const auto main_argv = parse_arg(argv[1]);
         std::println("Proxy Master command line mode:");
-        if(main_argv == "help")std::println("USAGE: proxy-master [COMMAND] [ARGS]...");
+        if(main_argv == "help")std::println(
+            "USAGE: proxy-master [COMMAND] [ARGS]...\n"
+            "Available commands:\nset → Sets the proxy\ncheck → Checks whether the proxy is on or not\nget → Gets the address of the set proxy if available"
+        );
         else if(main_argv == "set")
         {
             if(argc != 4)
@@ -41,6 +44,12 @@ auto main (int argc,char**argv) -> int
             }
             if(const auto result = proxy.set(argv[2], argv[3]);result)std::println("Proxy is set!");
             else std::println("Error: {}",result.error());
+        }
+        else if (main_argv == "get") 
+        {
+            const auto addr = proxy.get();
+            if(addr.has_value())std::println("{}:{}",addr->first,addr->second);
+            else std::println("Proxy is off");
         }
         else if(main_argv == "check") std::println("Proxy is {}",proxy.is_on()?"ON":"OFF");
         else std::println("Unknown command");
