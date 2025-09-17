@@ -118,9 +118,13 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
                             prev_ip_port.has_value()?LoggerWidget::SUCCESS: LoggerWidget::WARNING);
     if(prev_ip_port.has_value())
     {
-        const auto& [prev_ip,prev_port] = *prev_ip_port; //already checked so it's safe plus we have fhardened now.
+        //const auto& [prev_ip,prev_port] = *prev_ip_port; //already checked so it's safe plus we have fhardened now.
+        const auto& prev_ip = prev_ip_port->ip();
+        const auto& prev_port = prev_ip_port->port();
+        const auto  prev_snap_on = prev_ip_port->snap();
         ip_input->setText(prev_ip);
         port_input->setText(prev_port);
+        snap->setChecked(prev_snap_on);
         main_switch->set_state(SwitchWidget::STATE::ON);
         if(const auto find = std::ranges::find_if(*ip_entries,[&prev_ip,&prev_port](const auto &e){const auto& [_,ip,port] = e;return ip == prev_ip&&port == prev_port;});
         find != ip_entries->end())

@@ -1,8 +1,10 @@
 #include "proxy_handler.hpp"
+#include <algorithm>
 #include <cstdlib>
 #include <exception>
 #include <expected>
 #include <fstream>
+#include <functional>
 #include <iterator>
 #include <limits>
 #include <regex>
@@ -13,6 +15,37 @@
 #include <format>
 #include <ranges>
 #include <print> //It's needed for printing to files
+
+Proxy::Proxy(const std::string& _ip,const std::string& _port,const bool snap):
+m_ip(_ip),
+m_port(_port),
+m_snap(snap),
+first(std::bind(&Proxy::ip,this)),
+second(std::bind(&Proxy::ip,this)) 
+{}
+
+Proxy::Proxy(std::string&& ip,std::string&& port,const bool snap):
+m_ip(std::move(ip)),
+m_port(std::move(port)),
+m_snap(snap),
+first(std::bind(&Proxy::ip,this)),
+second(std::bind(&Proxy::ip,this)) 
+{}
+
+const std::string& Proxy::ip () const
+{
+    return m_ip;
+}
+
+const std::string& Proxy::port () const 
+{
+    return m_port;
+}
+
+auto Proxy::snap() const -> bool
+{
+    return m_snap;
+}
 
 ProxyHandler::ProxyHandler():
 gsettings(cmd_exists("gsettings")),
@@ -132,7 +165,7 @@ void ProxyHandler::reset()
     }
 }
 
-auto ProxyHandler::get() -> std::expected<std::pair<std::string,std::string>, std::string>
+auto ProxyHandler::get() -> std::expected<Proxy, std::string>
 {
     if(!this->is_on())return std::unexpected("No proxy is set");
     std::ifstream proxy_file(proxyfile_path);
@@ -141,9 +174,10 @@ auto ProxyHandler::get() -> std::expected<std::pair<std::string,std::string>, st
     std::regex_search(address,ip_match,std::regex(R"([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"));
     std::regex_search(address,port_match,std::regex(R"([0-9]+(?=\"|\s|\/))"));
     std::regex_search(address,snap_match,std::regex("snap=(\\w*)"));
-    const auto was_snap_active = snap_match[1] == "snap";
+    const auto was_snap_active { snap_match[1] == "true" };
     if(ip_match.empty()||port_match.empty())return std::unexpected("Currupted config file detected in: " + proxyfile_path.string() + " Set proxy again to override or delete the config file");
-    return std::make_tuple(ip_match[0],port_match[0]);//implicit conversion
+    //return std::make_tuple(ip_match[0],port_match[0]);//implicit conversion
+    return Proxy(ip_match[0],port_match[0],was_snap_active);
 }
 
 int ProxyHandler::run(const std::string &ip, const std::string &port, const std::string &cmd)
