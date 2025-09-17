@@ -30,14 +30,14 @@ bool ProxyHandler::cmd_exists(const std::string_view executable)
     const static auto path_env = std::getenv("PATH");
     if(not path_env)throw std::runtime_error("PATH does not exist on your system");
     const auto path = std::string (path_env);
+    
     auto path_seperated_view = path
     | std::views::split(':')
     | std::views::transform([](const auto c){return std::filesystem::path(c.begin(),c.end());});
-    for(const auto &p:path_seperated_view)
-    {
-        if(std::filesystem::exists(p/executable))return true;
-    }
-    return false;
+    return std::ranges::any_of(
+        path_seperated_view,
+        [](const auto &p){return std::filesystem::exists(p);}
+    );    
 }
 
 void ProxyHandler::set_snap(const bool b)
