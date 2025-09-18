@@ -28,7 +28,7 @@ git(cmd_exists("git"))
 bool ProxyHandler::cmd_exists(const std::string_view executable)
 {
     const static auto path_env = std::getenv("PATH");
-    if(not path_env)throw std::runtime_error("PATH does not exist on your system");
+    if(not path_env)throw std::runtime_error("The environment variable PATH does not exist on your system.");
     const auto path = std::string (path_env);
     
     auto path_seperated_view = path
@@ -37,7 +37,7 @@ bool ProxyHandler::cmd_exists(const std::string_view executable)
     return std::ranges::any_of(
         path_seperated_view,
         [](const auto &p){return std::filesystem::exists(p);}
-    );    
+    );
 }
 
 void ProxyHandler::set_snap(const bool b)
