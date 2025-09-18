@@ -118,10 +118,7 @@ manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::book
                             prev_ip_port.has_value()?LoggerWidget::SUCCESS: LoggerWidget::WARNING);
     if(prev_ip_port.has_value())
     {
-        //const auto& [prev_ip,prev_port] = *prev_ip_port; //already checked so it's safe plus we have fhardened now.
-        const auto& prev_ip = prev_ip_port->ip();
-        const auto& prev_port = prev_ip_port->port();
-        const auto  prev_snap_on = prev_ip_port->snap();
+        const auto& [prev_ip,prev_port,prev_snap_on] = *prev_ip_port; //already checked so it's safe plus we have fhardened now.
         ip_input->setText(prev_ip);
         port_input->setText(prev_port);
         snap->setChecked(prev_snap_on);

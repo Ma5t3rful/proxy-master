@@ -48,7 +48,7 @@ auto main (int argc,char**argv) -> int
         else if (main_argv == "get") 
         {
             const auto addr = proxy.get();
-            if(addr.has_value())std::println("{}:{}",addr->first(),addr->second());
+            if(addr.has_value())std::println("{}:{}",addr->ip,addr->port);
             else std::println("Proxy is off");
         }
         else if(main_argv == "check") std::println("Proxy is {}",proxy.is_on()?"ON":"OFF");

@@ -4,7 +4,6 @@
 #include <exception>
 #include <expected>
 #include <fstream>
-#include <functional>
 #include <iterator>
 #include <limits>
 #include <regex>
@@ -16,36 +15,6 @@
 #include <ranges>
 #include <print> //It's needed for printing to files
 
-Proxy::Proxy(const std::string& _ip,const std::string& _port,const bool snap):
-m_ip(_ip),
-m_port(_port),
-m_snap(snap),
-first(std::bind(&Proxy::ip,this)),
-second(std::bind(&Proxy::ip,this)) 
-{}
-
-Proxy::Proxy(std::string&& ip,std::string&& port,const bool snap):
-m_ip(std::move(ip)),
-m_port(std::move(port)),
-m_snap(snap),
-first(std::bind(&Proxy::ip,this)),
-second(std::bind(&Proxy::ip,this)) 
-{}
-
-const std::string& Proxy::ip () const
-{
-    return m_ip;
-}
-
-const std::string& Proxy::port () const 
-{
-    return m_port;
-}
-
-auto Proxy::snap() const -> bool
-{
-    return m_snap;
-}
 
 ProxyHandler::ProxyHandler():
 gsettings(cmd_exists("gsettings")),
@@ -54,9 +23,7 @@ kde(std::string(const_cast<const char*>(std::getenv("XDG_CURRENT_DESKTOP"))) == 
 username(std::getenv("USER")?std::getenv("USER"):""),
 proxyfile_path("/home"/username/".config/proxy-set.sh"),
 git(cmd_exists("git"))
-{
-
-}
+{}
 
 bool ProxyHandler::cmd_exists(const std::string_view executable)
 {
