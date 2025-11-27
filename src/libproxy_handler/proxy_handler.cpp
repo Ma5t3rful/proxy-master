@@ -36,7 +36,7 @@ bool ProxyHandler::cmd_exists(const std::string_view executable)
     | std::views::transform([](const auto c){return std::filesystem::path(c.begin(),c.end());});
     return std::ranges::any_of(
         path_seperated_view,
-        [](const auto &p){return std::filesystem::exists(p);}
+        [executable](const auto &p){return std::filesystem::exists(p/executable);}
     );
 }
 
