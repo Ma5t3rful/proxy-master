@@ -32,16 +32,16 @@ public tgui::Gui
 
     private:
     std::mutex messagebox_mutex; // for show_messagebox();
-    const tgui::Button::Ptr manage_btn;
-    const tgui::CheckBox::Ptr snap;
-    const tgui::ComboBox::Ptr bookmark_cmbobx;
-    const tgui::Button::Ptr commnad_go_btn;
+    const std::shared_ptr<SwitchWidget> main_switch;
+    const tgui::Button::Ptr force_off_button;
     const tgui::EditBox::Ptr ip_input;
     const tgui::EditBox::Ptr port_input;
+    const tgui::CheckBox::Ptr snap;
+    const tgui::ComboBox::Ptr bookmark_cmbobx;
+    const tgui::Button::Ptr manage_btn;
     const tgui::EditBox::Ptr command_input;
-    const tgui::Button::Ptr force_off_button;
+    const tgui::Button::Ptr commnad_go_btn;
     const tgui::ComboBox::Ptr actions_combobox;
-    const std::shared_ptr<SwitchWidget> main_switch;
     const tgui::Button::Ptr about_btn;
     const std::shared_ptr<ManageWindow> manage_window;
     const std::shared_ptr<LoggerWidget> logger; 

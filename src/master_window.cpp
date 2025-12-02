@@ -25,20 +25,20 @@
 
 MasterWindow::MasterWindow(GLFWwindow* w,ProxyHandler* p):
 tgui::Gui(w),
-proxy_handler(p),
-manage_btn(tgui::Button::create("Manage")),
-actions_combobox(tgui::ComboBox::create()),
-snap(tgui::CheckBox::create("Snap Proxy")),
-bookmark_cmbobx(std::make_shared<tgui::ComboBox>()),
 main_switch(std::make_shared<SwitchWidget>()),
+force_off_button(tgui::Button::create("Force Off")),
 ip_input(tgui::EditBox::create()),
 port_input(tgui::EditBox::create()),
+snap(tgui::CheckBox::create("Snap Proxy")),
+bookmark_cmbobx(std::make_shared<tgui::ComboBox>()),
+manage_btn(tgui::Button::create("Manage")),
 command_input(tgui::EditBox::create()),
 commnad_go_btn(tgui::Button::create(" > ")),
-force_off_button(tgui::Button::create("Force Off")),
-logger(std::make_shared<LoggerWidget>()),
+actions_combobox(tgui::ComboBox::create()),
 about_btn(tgui::Button::create("About")),
-manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::bookmarks_changed,this)))
+manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::bookmarks_changed,this))),
+logger(std::make_shared<LoggerWidget>()),
+proxy_handler(p)
 {
     constexpr auto default_height = 28; // this is default height for most buttons
     const auto title_label = tgui::Label::create("ProxyMaster");

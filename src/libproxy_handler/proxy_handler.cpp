@@ -20,9 +20,9 @@ ProxyHandler::ProxyHandler():
 gsettings(cmd_exists("gsettings")),
 snap(cmd_exists("snap")),
 kde(std::string(const_cast<const char*>(std::getenv("XDG_CURRENT_DESKTOP"))) == "KDE"), // Dangerous
+git(cmd_exists("git")),
 username(std::getenv("USER")?std::getenv("USER"):""),
-proxyfile_path("/home"/username/".config/proxy-set.sh"),
-git(cmd_exists("git"))
+proxyfile_path("/home"/username/".config/proxy-set.sh")
 {}
 
 bool ProxyHandler::cmd_exists(const std::string_view executable)

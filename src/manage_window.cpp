@@ -23,13 +23,13 @@ ok_func{of},
 name_edtbx(tgui::EditBox::create()),
 ip_edtbx(tgui::EditBox::create()),
 port_edtbx(tgui::EditBox::create()),
+ip_listview(tgui::ListView::create()),
 add_btn(tgui::Button::create("Add")),
 remove_btn(tgui::Button::create("Remove")),
 ok_button(tgui::Button::create("OK")),
 cancel(tgui::Button::create("Cancel")),
 up(tgui::Button::create("↑")),
 down(tgui::Button::create("↓")),
-ip_listview(tgui::ListView::create()),
 m_config_file_address("/home"/std::filesystem::path(std::getenv("USER"))/".config/proxy-master3.conf")
 {
     setResizable();
@@ -85,12 +85,9 @@ m_config_file_address("/home"/std::filesystem::path(std::getenv("USER"))/".confi
 
 void ManageWindow::load_from_config_file()
 {
-    // Edit: Fixed
-    // Known Bug: Currently, If We add a new entry and use qoutation marks the entry will be ignored.
     // Regular expression is not a good way of doing this. Maybe we need a proper config file library. "Inipp" would do the job better.
     // Or maybe lets just keep the show going with the standard lib and stop adding more deps.
     // Yeah, I guess i will continiue with std::regex but will make it more mature. Something like xml-like tags would help.
-    // Edit: Fixed
     std::ifstream config_file(m_config_file_address);
     if(!config_file)return;
     const std::regex entries_regex("<lphentry>(.*?)</lphentry>");
@@ -101,7 +98,7 @@ void ManageWindow::load_from_config_file()
         std::ranges::copy_if(std::sregex_token_iterator(line.cbegin(),line.cend(),entries_regex,1),
                             std::sregex_token_iterator(),
                             matchs_in_a_line.begin(),
-                            [i=0,&matchs_in_a_line](const auto& srgx)mutable{if(i>=matchs_in_a_line.size())return false;else i++;return true;});// safe enough
+                            [i=0uz,&matchs_in_a_line](const auto& srgx)mutable{if(i>=matchs_in_a_line.size())return false;else i++;return true;});// safe enough
         if(std::ranges::none_of(matchs_in_a_line,&std::string::empty))
             m_ip_list.emplace_back(std::move(matchs_in_a_line[0]),std::move(matchs_in_a_line[1]),std::move(matchs_in_a_line[2]));
     }
@@ -125,12 +122,13 @@ void ManageWindow::on_add_btn_clicked()
         ip_edtbx->getText(),
         port_edtbx->getText(),
     });
-    for(const auto d:{name_edtbx,ip_edtbx,port_edtbx})d->setText("");
+    for(const auto &d:{name_edtbx,ip_edtbx,port_edtbx})d->setText("");
 }
 
 void ManageWindow::on_remove_btn_clicked ()
 {
-    if(const auto selected_item=ip_listview->getSelectedItemIndex();selected_item != -1)
+    if(const auto selected_item=ip_listview->getSelectedItemIndex();
+       selected_item != -1)
     {
         ip_listview->removeItem(selected_item);
     }
@@ -153,7 +151,9 @@ void ManageWindow::on_up_btn_clicked()
 void ManageWindow::on_down_btn_clicked()
 {
     const auto current_index = ip_listview->getSelectedItemIndex();
-    if(const auto last_item = ip_listview->getItemCount()-1; current_index == last_item || current_index==-1)return;
+    if(const auto last_item = static_cast<int>(ip_listview->getItemCount())-1; 
+        current_index == last_item || current_index==-1)
+        return;
     const auto current_row = ip_listview->getItemRow(current_index);
     const auto tmp = ip_listview->getItemRow(current_index+1);
     for(auto i = 0 ;i<3;i++)

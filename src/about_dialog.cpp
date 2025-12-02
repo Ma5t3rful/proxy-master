@@ -19,8 +19,8 @@ description_lbl(tgui::Label::create(std::format(
 "Proxy Master version: {}\n"
 "TGUI version: {}.{}\n",ProxyMaster::version(),TGUI_VERSION_MAJOR, TGUI_VERSION_MINOR
 ))),
-ok_btn(tgui::Button::create("OK")),
-source_and_donation(tgui::RichTextLabel::create("<u>Source and Donation</u>"))
+source_and_donation(tgui::RichTextLabel::create("<u>Source and Donation</u>")),
+ok_btn(tgui::Button::create("OK"))
 {
     setOrigin(0.5,0.5);
     setPosition("50%","50%");
