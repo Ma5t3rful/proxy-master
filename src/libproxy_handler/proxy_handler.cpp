@@ -19,7 +19,7 @@
 ProxyHandler::ProxyHandler():
 gsettings(cmd_exists("gsettings")),
 snap(cmd_exists("snap")),
-kde(std::string(const_cast<const char*>(std::getenv("XDG_CURRENT_DESKTOP"))) == "KDE"), // Dangerous
+kde(cmd_exists("kwriteconfig5")), 
 git(cmd_exists("git")),
 username(std::getenv("USER")?std::getenv("USER"):""),
 proxyfile_path("/home"/username/".config/proxy-set.sh")

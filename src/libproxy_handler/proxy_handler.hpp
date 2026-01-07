@@ -21,6 +21,7 @@ class ProxyHandler{
     bool snap_available() const;
     bool is_on() const;
     static bool cmd_exists (const std::string_view executable);
+    
     private:
     void proxy_file_set(const std::string_view);
     auto validate_inputs(const std::string& ip, const std::string& port)->std::expected<void, std::string> const;
