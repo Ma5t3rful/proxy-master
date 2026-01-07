@@ -58,8 +58,13 @@ auto main (int argc,char**argv) -> int
     
     //this software is already linux-only. linux-specific way to find current exe
     const auto theme_path = std::filesystem::canonical("/proc/self/exe").remove_filename()/"dark.txt";
+    const auto theme_path2 = std::filesystem::canonical("/proc/self/exe").remove_filename()/"proxy-master-dark.txt";
     if(std::filesystem::exists(theme_path))
         tgui::Theme::setDefault(theme_path.string());
+    else if (std::filesystem::exists(theme_path2))
+    {
+        tgui::Theme::setDefault(theme_path2.string());
+    }
     else 
         std::println("ERROR: Couldn't find the theme file.");
     glfw_helper helper;
