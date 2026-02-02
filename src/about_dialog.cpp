@@ -15,7 +15,8 @@ description_lbl(tgui::Label::create(std::format(
 "This app lets you easily manage and set your user-wide proxy on Linux.\n"
 "It's mostly developed by just using modern C++ and its standard library. Only the GUI is created with TGUI.\n"
 "This software is free software and It's developed under the terms of MIT licence.\n"
-"Made with ♥\n"
+"Made with ❤️\n"
+"Monospace Font: DejaVu Sans Mono\n"
 "Proxy Master version: {}\n"
 "TGUI version: {}.{}\n",ProxyMaster::version(),TGUI_VERSION_MAJOR, TGUI_VERSION_MINOR
 ))),
@@ -24,7 +25,7 @@ ok_btn(tgui::Button::create("OK"))
 {
     setOrigin(0.5,0.5);
     setPosition("50%","50%");
-    setSize(320,240);
+    setSize(330,256);
     setTitle("About ProxyMaster");
     const auto ok_btn_cntainr = std::make_shared<tgui::Group>();
     ok_btn_cntainr->setHeight(30);

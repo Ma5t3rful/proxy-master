@@ -1,4 +1,5 @@
 #include "logger.hpp"
+#include "TGUI/Font.hpp"
 #include <cstddef>
 #include <limits>
 #include <format>
@@ -8,18 +9,22 @@
 LoggerWidget::LoggerWidget():
 m_buffer ("<color=#ffffff>- **LOGS**\n</color>")
 {
+    const static unsigned char data[] = {
+        #embed "DejaVuSansMono.ttf"
+    };
     const auto renderer = getRenderer();
     renderer->setBackgroundColor("#3a3a3a");
     onClick(&LoggerWidget::on_click,this);
     setText(m_buffer);
     setSize(250,170);
     getRenderer()->setScrollbarWidth(8);
+    setInheritedFont(tgui::Font{data,std::size(data)});
 }
 
 void LoggerWidget::log(const std::string_view text,const MSG_TYPE type)
 {
     const std::array color {"#00cfdf","green","#df00df","red"};
-    m_buffer += std::format("<color={}>- {}</color>\n",color[static_cast<std::size_t>(type)],text);
+    m_buffer += std::format("-<color={}> {}</color>\n",color[static_cast<std::size_t>(type)],text);
     std::lock_guard _(m_log_mutex);
     setText(m_buffer);
     getScrollbar()->setValue(std::numeric_limits<unsigned int>::max());
@@ -32,9 +37,11 @@ void LoggerWidget::on_click()
     t++;
     if(t==6)log(
 R"(<color=#ff8800>Congrats: You found a Pizza!
-// ""--.._
-||  (_)  _ "-._
-||    _ (_) °  '-.
-||   (_) O __..-'
- \\__..--""</color>)");
+  _-~*"""*~-_
+ // 8 _ o B \\
+//   (_)   - \\
+|| @ 8 _  o  ||
+\\    (_)  O //
+ \\ 0    °  //
+   ^=.___.=^</color>)");
 }
