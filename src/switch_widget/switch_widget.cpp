@@ -7,26 +7,24 @@
 #include <iterator>
 #include <utility>
 
-// Finally embed. No need to use xxd -i and CMake garbage for this.
-unsigned char power_button_icon_on_png[]={
-    #embed "power_button_icon_on.png"
-};
-
-unsigned char power_button_icon_off_png[]={
-    #embed "power_button_icon_off.png"
-};
-
-unsigned char power_button_icon_limbo_png[]={
-    #embed "power_button_icon_limbo.png"
-};
-
 SwitchWidget::SwitchWidget():
 m_state(SwitchWidget::STATE::OFF)
 {
+    // Finally embed. No need to use xxd -i and CMake garbage for this.
+    static unsigned char power_button_icon_on_png[]={
+    #embed "power_button_icon_on.png"
+};
+
+    static unsigned char power_button_icon_off_png[]={
+    #embed "power_button_icon_off.png"
+    };
+
+    static unsigned char power_button_icon_limbo_png[]={
+    #embed "power_button_icon_limbo.png"
+    };
     m_on_texture.loadFromMemory(power_button_icon_on_png, std::size(power_button_icon_on_png));
     m_off_texture.loadFromMemory(power_button_icon_off_png, std::size(power_button_icon_off_png));
     m_limbo_texture.loadFromMemory(power_button_icon_limbo_png, std::size(power_button_icon_limbo_png));
-    
     setImageScaling(1);
     setImage(m_off_texture);
     for(const auto renderer = getRenderer();const auto &f: {
