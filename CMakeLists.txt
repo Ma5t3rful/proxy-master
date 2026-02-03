@@ -12,8 +12,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(TGUI)
 file(GLOB_RECURSE PROXY_MASTER_SRC src/*.cpp)
-include_directories(src/libproxy* ui)
-include_directories(src/switch_widget)
+include_directories(src/libproxy_handler
+                    src/center_layout_widget
+                    src/switch_widget)
+
 configure_file(ui/dark.txt ${CMAKE_CURRENT_BINARY_DIR}/ COPYONLY)
 configure_file(src/cmake_version.hpp.cfg cmake_version.hpp)
 
