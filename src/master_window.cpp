@@ -7,12 +7,14 @@
 #include "TGUI/Widgets/ComboBox.hpp"
 #include "TGUI/Widgets/EditBox.hpp"
 #include "TGUI/Widgets/Group.hpp"
+#include "TGUI/Widgets/HorizontalLayout.hpp"
 #include "TGUI/Widgets/Label.hpp"
 #include "TGUI/Widgets/MessageBox.hpp"
 #include "TGUI/Widgets/SplitContainer.hpp"
 #include "TGUI/Widgets/VerticalLayout.hpp"
 #include "about_dialog.hpp"
-#include "libproxy_handler/proxy_handler.hpp"
+#include "center_layout_widget.hpp"
+#include "proxy_handler.hpp"
 #include "logger.hpp"
 #include "manage_window.hpp"
 #include "switch_widget.hpp"
@@ -22,6 +24,8 @@
 #include <memory>
 #include <mutex>
 #include <string_view>
+#include <ranges>
+#include <vector>
 
 MasterWindow::MasterWindow(GLFWwindow* w,ProxyHandler* p):
 tgui::Gui(w),
@@ -29,7 +33,7 @@ main_switch(std::make_shared<SwitchWidget>()),
 force_off_button(tgui::Button::create("Force Off")),
 ip_input(tgui::EditBox::create()),
 port_input(tgui::EditBox::create()),
-snap(tgui::CheckBox::create("Snap Proxy")),
+snap_chkbox(tgui::CheckBox::create("Snap Proxy")),
 bookmark_cmbobx(std::make_shared<tgui::ComboBox>()),
 manage_btn(tgui::Button::create("Manage")),
 command_input(tgui::EditBox::create()),
@@ -51,12 +55,14 @@ proxy_handler(p)
     title_label->setHeight(48);
     title_label->getScrollbar()->setPolicy(tgui::Scrollbar::Policy::Never);
     title_label->setHorizontalAlignment(tgui::HorizontalAlignment::Center);
+    // Actions are still unused 
     actions_combobox->setOrigin(0.5f,0);
     actions_combobox->setPosition("50%",190);
     actions_combobox->setDefaultText("Actions");
     actions_combobox->addItem("Force Off");
     actions_combobox->addItem("Force On");
     actions_combobox->addItem("Test...");
+    actions_combobox->setWidth(90);
     actions_combobox->onItemSelect(&MasterWindow::on_actions_cmbobx_changed,this);
     force_off_button->setPosition("50%",180);
     main_switch->onClick(&MasterWindow::on_mainswitch_clicked,this);
@@ -66,7 +72,7 @@ proxy_handler(p)
     about_btn->onClick(&MasterWindow::on_about_btn_clicked,this);
     logger->setOrigin(0.5,0);
     logger->setPosition("50%",430);
-    logger->log("Initialized.",LoggerWidget::INFO);
+    logger->log("Initialized.");
     main_switch->setOrigin(0.5,0);
     main_switch->setSize(128,128);
     main_switch->setPosition("50%",48);
@@ -94,9 +100,8 @@ proxy_handler(p)
     about_btn->setPosition("50%","100%-20");
     
     //workaround for streched checkbox
-    const auto checkbox_orig_size = snap->getSize().y;
-    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap.get(),checkbox_orig_size);
-    
+    const auto checkbox_orig_size = snap_chkbox->getSize().y;
+    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox,checkbox_orig_size);
     bookmark_cmbobx->onItemSelect(&MasterWindow::on_bookmark_cmbobx_changed,this);
     bookmark_cmbobx->setDefaultText("Bookmarks");
     command_input->setAutoLayout(tgui::AutoLayout::Fill);
@@ -112,7 +117,7 @@ proxy_handler(p)
         actions_combobox->addItem("Re-enable with snap");
         actions_combobox->addItem("Re-disable with snap");
     }
-    snap->setEnabled(snap_available);
+    snap_chkbox->setEnabled(snap_available);
     const auto prev_ip_port = proxy_handler->get();
     logger->log(std::format("Current State: {}",prev_ip_port.has_value()?"<b>ON</b>":"<b>OFF</b>"),
                             prev_ip_port.has_value()?LoggerWidget::SUCCESS: LoggerWidget::WARNING);
@@ -121,7 +126,7 @@ proxy_handler(p)
         const auto& [prev_ip,prev_port,prev_snap_on] = *prev_ip_port; //already checked so it's safe plus we have fhardened now.
         ip_input->setText(prev_ip);
         port_input->setText(prev_port);
-        snap->setChecked(prev_snap_on);
+        snap_chkbox->setChecked(prev_snap_on);
         main_switch->set_state(SwitchWidget::STATE::ON);
         if(const auto find = std::ranges::find_if(*ip_entries,[&prev_ip,&prev_port](const auto &e){const auto& [_,ip,port] = e;return ip == prev_ip&&port == prev_port;});
         find != ip_entries->end())
@@ -145,12 +150,12 @@ proxy_handler(p)
     add(launcher_group);
     add(about_btn);
     // add(actions_combobox);
-    snap->setSize(checkbox_orig_size, checkbox_orig_size);
+    snap_chkbox->setSize(checkbox_orig_size, checkbox_orig_size);
 }
 
 void MasterWindow::on_mainswitch_clicked()
 {
-    proxy_handler->set_snap(snap->isChecked());
+    proxy_handler->set_snap(snap_chkbox->isChecked());
     if(main_switch->state()==SwitchWidget::STATE::ON)// if on then turn it off
     {
         try{
@@ -164,14 +169,18 @@ void MasterWindow::on_mainswitch_clicked()
     }
     const auto ip = ip_input->getText().toStdString();
     const auto port = port_input->getText().toStdString();
-    if(const auto res = proxy_handler->set(ip, port);
-    res)
+    if(const auto result = proxy_handler->set(ip, port);
+    result)
     {
         main_switch->set_state(SwitchWidget::STATE::ON);
         logger->log(std::format("addr: http://{}:{}",ip,port),LoggerWidget::SUCCESS);
         logger->log("Current State: <b>ON</b>", LoggerWidget::SUCCESS);
     }
-    else logger->log(res.error(),LoggerWidget::ERROR);
+    else
+    {
+        logger->log(result.error(),LoggerWidget::ERROR);
+        show_messagebox("Failed to properly set the proxy", result.error());
+    }
 }
 
 void MasterWindow::on_force_off_cliced()
@@ -201,9 +210,9 @@ void MasterWindow::on_any_input_changed()
 void MasterWindow::on_bookmark_cmbobx_changed (const int selected_idx)
 {
     const auto entries = manage_window->get_entries();
-    const auto&selected_entry = entries->at(selected_idx);
-    ip_input->setText(std::get<1>(selected_entry));
-    port_input->setText(std::get<2>(selected_entry));
+    const auto& [_,ip,port] = entries->at(selected_idx);
+    ip_input->setText(ip);
+    port_input->setText(port);
     logger->log(std::format("Bookmark changed to: {}",bookmark_cmbobx->getSelectedItem().toStdString()));
 }
 
@@ -241,10 +250,16 @@ void MasterWindow::on_about_btn_clicked()
 
 void MasterWindow::show_messagebox(const std::string_view title,const std::string_view message)
 {
+    constexpr auto messagebox_width = 230.f;
     std::lock_guard _ (messagebox_mutex);
     const auto messagebox_ptr = tgui::MessageBox::create(std::string(title),std::string(message),{"ok"});
     messagebox_ptr->setOrigin(0.5f,0.5f);
     messagebox_ptr->setPosition("50%", "50%");
+    const auto& widgets = messagebox_ptr->getWidgets();
+    const auto msgbox_label = std::static_pointer_cast<tgui::Label>(widgets.at(0));
+    msgbox_label->setMaximumTextWidth(messagebox_width);
+    messagebox_ptr->setSize(std::max(msgbox_label->getFullSize().x + 20, messagebox_width),
+                            120);
     messagebox_ptr->onButtonPress(&tgui::MessageBox::close,messagebox_ptr);
     add(messagebox_ptr);
 }

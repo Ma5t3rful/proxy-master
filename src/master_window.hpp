@@ -17,7 +17,11 @@ class MasterWindow:
 public tgui::Gui
 {
     public:
+    enum class experimental_ui{
+        ACTIVATE = 1,
+    };
     MasterWindow(GLFWwindow*,ProxyHandler*);
+    MasterWindow(GLFWwindow*,ProxyHandler*,[[maybe_unused]]const experimental_ui exp_ui);
     private:
     void on_mainswitch_clicked();
     void on_manage_clicked();
@@ -36,7 +40,7 @@ public tgui::Gui
     const tgui::Button::Ptr force_off_button;
     const tgui::EditBox::Ptr ip_input;
     const tgui::EditBox::Ptr port_input;
-    const tgui::CheckBox::Ptr snap;
+    const tgui::CheckBox::Ptr snap_chkbox;
     const tgui::ComboBox::Ptr bookmark_cmbobx;
     const tgui::Button::Ptr manage_btn;
     const tgui::EditBox::Ptr command_input;
