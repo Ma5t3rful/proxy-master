@@ -11,7 +11,12 @@ class CenterLayoutWidget
 {
     public:
     CenterLayoutWidget();
+    
+    void add (const std::shared_ptr<tgui::Widget>&,const tgui::String& = "") override;
+    
+    [[deprecated("Use add() instead.")]]
     void add_widget (const std::shared_ptr<tgui::Widget>&,const tgui::String& = "");
+    
     void set_spacing (const float);
     // void add (const std::shared_ptr<tgui::Widget>&,const tgui::String&) ;
     private:
