@@ -21,11 +21,13 @@
 #include <array>
 #include <exception>
 #include <expected>
+#include <iterator>
 #include <memory>
 #include <mutex>
 #include <string_view>
 #include <ranges>
 #include <vector>
+
 
 MasterWindow::MasterWindow(GLFWwindow* w,ProxyHandler* p):
 tgui::Gui(w),
@@ -57,7 +59,7 @@ proxy_handler(p)
     title_label->setHorizontalAlignment(tgui::HorizontalAlignment::Center);
     // Actions are still unused 
     actions_combobox->setOrigin(0.5f,0);
-    actions_combobox->setPosition("50%",190);
+    actions_combobox->setPosition("50%",180);
     actions_combobox->setDefaultText("Actions");
     actions_combobox->addItem("Force Off");
     actions_combobox->addItem("Force On");
@@ -87,9 +89,9 @@ proxy_handler(p)
     ip_vert_layout->setPosition("50%",215);
     ip_vert_layout->setSize("90%",122);
     ip_vert_layout->getRenderer()->setSpaceBetweenWidgets(3);
-    for(const auto& w:std::array<std::shared_ptr<tgui::Widget>, 4>{ip_input,port_input,snap,split_manage})ip_vert_layout->add(w);
+    for(const auto& w:std::array<std::shared_ptr<tgui::Widget>, 4>{ip_input,port_input,snap_chkbox,split_manage})ip_vert_layout->add(w);
     const auto launcher_group = std::make_shared<tgui::Group>();
-    launcher_group->setSize("90%",ip_input->getSize().y+13);
+    launcher_group->setSize("90%",default_height+13);
     launcher_group->setPosition("50%",364);
     launcher_group->setOrigin(0.5,0);
     launcher_group->add(command_input);
@@ -98,7 +100,6 @@ proxy_handler(p)
     about_btn->setHeight(default_height);
     about_btn->setOrigin(0.5,1);
     about_btn->setPosition("50%","100%-20");
-    
     //workaround for streched checkbox
     const auto checkbox_orig_size = snap_chkbox->getSize().y;
     onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox,checkbox_orig_size);
@@ -153,6 +154,126 @@ proxy_handler(p)
     snap_chkbox->setSize(checkbox_orig_size, checkbox_orig_size);
 }
 
+
+
+////////////////////// Second constructor for UI redesign ///////////////////////
+MasterWindow::MasterWindow(GLFWwindow* w,ProxyHandler* p, const experimental_ui):
+tgui::Gui(w),
+main_switch(std::make_shared<SwitchWidget>()),
+force_off_button(tgui::Button::create("Force Off")),
+ip_input(tgui::EditBox::create()),
+port_input(tgui::EditBox::create()),
+snap_chkbox(tgui::CheckBox::create("Snap Proxy")),
+bookmark_cmbobx(std::make_shared<tgui::ComboBox>()),
+manage_btn(tgui::Button::create("Manage")),
+command_input(tgui::EditBox::create()),
+commnad_go_btn(tgui::Button::create(" > ")),
+actions_combobox(tgui::ComboBox::create()),
+about_btn(tgui::Button::create("About")),
+manage_window(std::make_shared<ManageWindow>(std::bind_front(&MasterWindow::bookmarks_changed,this))),
+logger(std::make_shared<LoggerWidget>()),
+proxy_handler(p)
+{
+    const auto proxy_master_lbl = tgui::Label::create("Proxy Master");
+    proxy_master_lbl->setTextSize(28);
+    proxy_master_lbl->getScrollbar()->setPolicy(tgui::Scrollbar::Policy::Never);
+    proxy_master_lbl->setHorizontalAlignment(tgui::HorizontalAlignment::Center);
+    proxy_master_lbl->setWidth("100%");
+    // proxy_master_lbl->setAutoLayout(tgui::AutoLayout::Top);
+    add(proxy_master_lbl);
+
+
+    const auto master_group = tgui::Group::create();
+    master_group->setOrigin(.5f,.5f);
+    master_group->setPosition("50%","50%");
+    master_group->setWidth("100%-10"); //10 px padding
+
+
+    const auto main_switch_container = std::make_shared<CenterLayoutWidget>();
+    const auto force_off_button_wrapper = tgui::Group::create();
+    main_switch->onClick(&MasterWindow::on_mainswitch_clicked,this);
+    main_switch->setHeight(128);
+    force_off_button->onClick(&MasterWindow::on_force_off_cliced,this);
+    force_off_button_wrapper->setHeight(30);
+    force_off_button->setOrigin(0.5,0.5);
+    force_off_button->setPosition("50%");
+    force_off_button_wrapper->add(force_off_button);
+
+    main_switch_container->add_widget(main_switch);
+    main_switch_container->add_widget(force_off_button_wrapper);
+    main_switch_container->setWidth("30%");
+    main_switch_container->setAutoLayout(tgui::AutoLayout::Left);
+    master_group->add(main_switch_container);
+    
+
+    const auto ip_port_container = std::make_shared<CenterLayoutWidget>();
+    ip_input->setDefaultText("IP Address");
+    port_input->setDefaultText("Port");
+    ip_port_container->setHeight("100%");
+    ip_port_container->setAutoLayout(tgui::AutoLayout::Fill);
+    ip_port_container->set_spacing(10);
+    ip_port_container->add_widget(ip_input);
+    ip_port_container->add_widget(port_input);
+    ip_port_container->add_widget(snap_chkbox);    
+    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox,snap_chkbox->getSize().y);
+    
+    const auto spacing = std::make_shared<tgui::Group>();//for separating ip port and booksmarks a bit
+    spacing->setHeight(1);
+    ip_port_container->add_widget(spacing);
+    const auto bookmarks_container = tgui::HorizontalLayout::create();
+    bookmarks_container->getRenderer()->setSpaceBetweenWidgets(10);
+    bookmarks_container->setHeight(24);
+    bookmarks_container->add(bookmark_cmbobx);
+    bookmarks_container->add(manage_btn);
+    ip_port_container->add_widget(bookmarks_container);
+    const auto command_runner_container = tgui::Group::create();
+    command_runner_container->setHeight(ip_input->getSize().y);
+    command_input->setDefaultText("App Launcher");
+    command_input->setAutoLayout(tgui::AutoLayout::Fill);
+    commnad_go_btn->setAutoLayout(tgui::AutoLayout::Right);
+    command_runner_container->add(command_input);
+    command_runner_container->add(commnad_go_btn);
+    ip_port_container->add_widget(command_runner_container);
+    master_group->add(ip_port_container);
+    
+    add(master_group);
+    
+    
+    const auto bookmarks_from_cfg = manage_window->get_entries();
+    for(const auto& title : *bookmarks_from_cfg | std::views::elements<0>)bookmark_cmbobx->addItem(title);
+    snap_chkbox->setEnabled(proxy_handler->snap_available());
+    if(const auto prev_ip_port = proxy_handler->get();
+       prev_ip_port.has_value())
+    {
+        main_switch->set_state(SwitchWidget::STATE::ON);
+        const auto& [ip,port,snap] = *prev_ip_port;
+        ip_input->setText(ip);
+        port_input->setText(port);
+        snap_chkbox->setChecked(snap);
+        if(const auto prev_selected_bookmark = std::ranges::find_if(*bookmarks_from_cfg,[&ip,&port](const auto &bookmark){
+            const auto &[_,_i,_p] = bookmark;
+            return _i == ip and _p==(port);
+        });
+        prev_selected_bookmark!=bookmarks_from_cfg->end())
+        {
+            bookmark_cmbobx->setSelectedItemByIndex(std::distance(bookmarks_from_cfg->begin(),prev_selected_bookmark));
+        }
+    }
+    else 
+    {
+        main_switch->set_state(SwitchWidget::STATE::OFF);
+    }
+    ip_input->onTextChange(&MasterWindow::on_any_input_changed,this);
+    port_input->onTextChange(&MasterWindow::on_any_input_changed,this);
+    bookmark_cmbobx->onItemSelect(&MasterWindow::on_bookmark_cmbobx_changed,this);
+    manage_btn->onClick(&MasterWindow::on_manage_clicked,this);
+    commnad_go_btn->onClick(&MasterWindow::on_go_command_clicked,this);
+    
+    snap_chkbox->setWidth(snap_chkbox->getSize().y);
+}
+
+
+
 void MasterWindow::on_mainswitch_clicked()
 {
     proxy_handler->set_snap(snap_chkbox->isChecked());
@@ -193,6 +314,19 @@ void MasterWindow::on_force_off_cliced()
 void MasterWindow::on_actions_cmbobx_changed (const int selected_idx)
 {
     logger->log(std::format("Item changed to: {}",selected_idx));
+    switch(selected_idx)
+    {
+        case 0:{
+            on_force_off_cliced();
+            break;
+        }
+        case 1:{
+            break;
+        }
+        default:{
+            logger->log("Undesired value received by combobox. This is a ui issue in master window.",LoggerWidget::MSG_TYPE::ERROR);
+        }
+    }
     actions_combobox->deselectItem();
 }
 
@@ -224,7 +358,7 @@ void MasterWindow::on_manage_clicked()
 void MasterWindow::bookmarks_changed (const std::vector<ip_entry>* const bookmarks)
 {
     bookmark_cmbobx->removeAllItems();
-    for(const auto& [name,_,_] : *bookmarks) // I dont know why but gcc crashes when I use C++26's placeholder variables - fixed in gcc 15
+    for(const auto& name : *bookmarks|std::views::elements<0>) // I dont know why but gcc crashes when I use C++26's placeholder variables - fixed in gcc 15
     {
         bookmark_cmbobx->addItem(name);
     }
