@@ -102,7 +102,9 @@ proxy_handler(p)
     about_btn->setPosition("50%","100%-20");
     //workaround for streched checkbox
     const auto checkbox_orig_size = snap_chkbox->getSize().y;
-    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox,checkbox_orig_size);
+    // Possible tgui bug: onViewChange can extend the lifetime of the widget beyond the tgui::Gui's lifetime. We can use the get function to let the smart pointer release the memory. 
+    // before the lifetime of the object
+    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox.get(),checkbox_orig_size);
     bookmark_cmbobx->onItemSelect(&MasterWindow::on_bookmark_cmbobx_changed,this);
     bookmark_cmbobx->setDefaultText("Bookmarks");
     command_input->setAutoLayout(tgui::AutoLayout::Fill);
@@ -215,7 +217,7 @@ proxy_handler(p)
     ip_port_container->add_widget(ip_input);
     ip_port_container->add_widget(port_input);
     ip_port_container->add_widget(snap_chkbox);    
-    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox,snap_chkbox->getSize().y);
+    onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox.get(),snap_chkbox->getSize().y);
     
     const auto spacing = std::make_shared<tgui::Group>();//for separating ip port and booksmarks a bit
     spacing->setHeight(1);
