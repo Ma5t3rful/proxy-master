@@ -194,7 +194,7 @@ proxy_handler(p)
     const auto main_switch_container = std::make_shared<CenterLayoutWidget>();
     const auto force_off_button_wrapper = tgui::Group::create();
     main_switch->onClick(&MasterWindow::on_mainswitch_clicked,this);
-    main_switch->setHeight(128);
+    main_switch->setHeight(148);
     force_off_button->onClick(&MasterWindow::on_force_off_cliced,this);
     force_off_button_wrapper->setHeight(30);
     force_off_button->setOrigin(0.5,0.5);
