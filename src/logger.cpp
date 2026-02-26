@@ -5,7 +5,6 @@
 #include <format>
 #include <mutex>
 
-
 LoggerWidget::LoggerWidget():
 m_buffer ("<color=#ffffff>- **LOGS**\n</color>")
 {
@@ -18,7 +17,8 @@ m_buffer ("<color=#ffffff>- **LOGS**\n</color>")
     setText(m_buffer);
     setSize(250,170);
     getRenderer()->setScrollbarWidth(8);
-    setInheritedFont(tgui::Font{data,std::size(data)});
+    tgui::Font font{data,std::size(data)};
+    renderer->setFont(font);
 }
 
 void LoggerWidget::log(const std::string_view text,const MSG_TYPE type)
