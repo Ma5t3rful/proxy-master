@@ -3,7 +3,6 @@
 #include <string_view>
 #include <unordered_map>
 #include <filesystem>
-#include "TGUI/Backend/GLFW-OpenGL3.hpp"
 #include "TGUI/Loading/Theme.hpp"
 #include "libproxy_handler/proxy_handler.hpp"
 #include "master_window.hpp"
@@ -68,8 +67,9 @@ auto main (int argc,char**argv) -> int
     }
     else 
         std::println("ERROR: Couldn't find the theme file.");
+    
+    
     glfw_helper helper;
-    tgui::Gui gui (helper.window);
     MasterWindow w(helper.window,&proxy);
     w.mainLoop("#1a1a1a");
 }
