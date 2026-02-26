@@ -7,8 +7,7 @@ set(TGUI_BUILD_GUI_BUILDER OFF)
 include(FetchContent)
 FetchContent_Declare(
     TGUI
-    GIT_REPOSITORY https://github.com/texus/TGUI
-    GIT_TAG v1.11.0
+    URL https://github.com/texus/TGUI/archive/refs/tags/v1.12.0.tar.gz
 )
 FetchContent_MakeAvailable(TGUI)
 file(GLOB_RECURSE PROXY_MASTER_SRC src/*.cpp)
