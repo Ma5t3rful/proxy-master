@@ -19,7 +19,8 @@
 ProxyHandler::ProxyHandler():
 gsettings(cmd_exists("gsettings")),
 snap(cmd_exists("snap")),
-kde(cmd_exists("kwriteconfig5")), 
+kwriteconfig5(cmd_exists("kwriteconfig5")), 
+kwriteconfig6(cmd_exists("kwriteconfig6")),
 git(cmd_exists("git")),
 username(std::getenv("USER")?std::getenv("USER"):""),
 proxyfile_path("/home"/username/".config/proxy-set.sh")
@@ -76,15 +77,27 @@ auto ProxyHandler::set(const std::string &ip, const std::string &port) -> std::e
         /*std::ignore = std::system(("pkexec sh -c 'snap set system proxy.http=" + address +
                                    " && "+          "snap set system proxy.https="+ address+'\'').c_str());*/
     }
-    if(kde)
+    
+    const auto kwriteconfig_protocols = {"httpProxy","httpsProxy","socksProxy","ftpProxy"};
+    if(kwriteconfig5)
     {
-        for(const auto& protocol:{"httpProxy","httpsProxy","socksProxy","ftpProxy"})
+        for(const auto& protocol:kwriteconfig_protocols)
         {
-            const auto cmd = std::format("kwriteconfig5 --file kioslaverc --group 'Proxy Settings' --key {} http://{}:{}",protocol,ip,port);
+            const auto cmd  = std::format("kwriteconfig5 --file kioslaverc --group 'Proxy Settings' --key {} http://{}:{}", protocol, ip, port);
             std::ignore = std::system(cmd.c_str());
         }
         std::ignore = std::system("kwriteconfig5 --file kioslaverc --group 'Proxy Settings' --key ProxyType 1");
     }
+    else if(kwriteconfig6)
+    {
+        for(const auto& protocol:kwriteconfig_protocols)
+        {
+            const auto cmd6 = std::format("kwriteconfig6 --file kioslaverc --group 'Proxy Settings' --key {} http://{}:{}", protocol, ip, port);
+            std::ignore = std::system(cmd6.c_str());
+        }
+        std::ignore = std::system("kwriteconfig6 --file kioslaverc --group 'Proxy Settings' --key ProxyType 1");
+    }
+
     if (git)
     {
         const auto git_set_proxy_cmd = std::format("git config --global http.proxy  {0} &&"
@@ -115,10 +128,11 @@ void ProxyHandler::reset()
     {
         std::ignore = std::system("pkexec snap unset system proxy.http proxy.https");
     }
-    if (kde)
+    if (kwriteconfig5)
     {
         std::ignore = std::system("kwriteconfig5 --file kioslaverc --group 'Proxy Settings' --key ProxyType 0");
     }
+    if (kwriteconfig6) std::ignore = std::system("kwriteconfig6 --file kioslaverc --group 'Proxy Settings' --key ProxyType 0");
     if(gsettings)
     {
         if(

@@ -25,7 +25,7 @@ class ProxyHandler{
     private:
     void proxy_file_set(const std::string_view);
     auto validate_inputs(const std::string& ip, const std::string& port)->std::expected<void, std::string> const;
-    bool gsettings,snap,kde,git;
+    bool gsettings,snap,kwriteconfig5,kwriteconfig6,git;
     const std::filesystem::path username;
     const std::filesystem::path proxyfile_path;
 };

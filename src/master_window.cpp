@@ -102,7 +102,7 @@ proxy_handler(p)
     about_btn->setPosition("50%","100%-20");
     //workaround for streched checkbox
     const auto checkbox_orig_size = snap_chkbox->getSize().y;
-    // Possible tgui bug: onViewChange can extend the lifetime of the widget beyond the tgui::Gui's lifetime. We can use the get function to let the smart pointer release the memory. 
+    // Possible tgui bug: onViewChange can extend the lifetime of the widget beyond the tgui::Gui's lifetime. We can use the get function to let the smart pointer release the memory, 
     // before the lifetime of the object
     onViewChange(static_cast<void(tgui::CheckBox::*)(const tgui::Layout)>(&tgui::CheckBox::setWidth),snap_chkbox.get(),checkbox_orig_size);
     bookmark_cmbobx->onItemSelect(&MasterWindow::on_bookmark_cmbobx_changed,this);
@@ -310,7 +310,7 @@ void MasterWindow::on_force_off_cliced()
 {
     proxy_handler->reset();
     main_switch->set_state(SwitchWidget::STATE::OFF);
-    logger->log("All proxy settings has been resetted", LoggerWidget::SUCCESS);
+    logger->log("All proxy settings has been reset", LoggerWidget::SUCCESS);
 }
 
 void MasterWindow::on_actions_cmbobx_changed (const int selected_idx)
