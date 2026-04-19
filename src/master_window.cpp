@@ -1,4 +1,5 @@
 #include "master_window.hpp"
+#include "TGUI/Cursor.hpp"
 #include "TGUI/Layout.hpp"
 #include "TGUI/Vector2.hpp"
 #include "TGUI/Widget.hpp"
@@ -80,6 +81,8 @@ proxy_handler(p)
     main_switch->setPosition("50%",48);
     force_off_button->setOrigin(0.5,0);
     const auto ip_vert_layout = tgui::VerticalLayout::create();
+    ip_input->setMouseCursor(tgui::Cursor::Type::Text);
+    port_input->setMouseCursor(tgui::Cursor::Type::Text);
     const auto split_manage = tgui::SplitContainer::create();
     split_manage->add(bookmark_cmbobx);
     split_manage->add(manage_btn);
@@ -100,7 +103,7 @@ proxy_handler(p)
     about_btn->setHeight(default_height);
     about_btn->setOrigin(0.5,1);
     about_btn->setPosition("50%","100%-20");
-    //workaround for streched checkbox
+    // workaround for streched checkbox
     const auto checkbox_orig_size = snap_chkbox->getSize().y;
     // Possible tgui bug: onViewChange can extend the lifetime of the widget beyond the tgui::Gui's lifetime. We can use the get function to let the smart pointer release the memory, 
     // before the lifetime of the object
@@ -108,6 +111,7 @@ proxy_handler(p)
     bookmark_cmbobx->onItemSelect(&MasterWindow::on_bookmark_cmbobx_changed,this);
     bookmark_cmbobx->setDefaultText("Bookmarks");
     command_input->setAutoLayout(tgui::AutoLayout::Fill);
+    command_input->setMouseCursor(tgui::Cursor::Type::Text);
     commnad_go_btn->setAutoLayout(tgui::AutoLayout::Right);
     // get data from previous config
     force_off_button->setHeight(default_height);
@@ -270,7 +274,7 @@ proxy_handler(p)
     bookmark_cmbobx->onItemSelect(&MasterWindow::on_bookmark_cmbobx_changed,this);
     manage_btn->onClick(&MasterWindow::on_manage_clicked,this);
     commnad_go_btn->onClick(&MasterWindow::on_go_command_clicked,this);
-    
+
     snap_chkbox->setWidth(snap_chkbox->getSize().y);
 }
 
